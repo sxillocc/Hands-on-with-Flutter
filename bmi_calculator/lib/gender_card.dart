@@ -24,12 +24,24 @@ class GenderCard extends StatefulWidget {
   _GenderCardState createState() => _GenderCardState();
 }
 
-class _GenderCardState extends State<GenderCard> {
+class _GenderCardState extends State<GenderCard> with SingleTickerProviderStateMixin {
   Gender selectedGender;
+  AnimationController _arrowAnimationController;
 
   void initState(){
     selectedGender = widget.initialGender ?? Gender.other ;
+    _arrowAnimationController = AnimationController(
+      vsync: this,
+      value: _genderAngles[selectedGender],
+      upperBound: _defaultGenderAngle,
+      lowerBound: -_defaultGenderAngle
+    );
     super.initState();
+  }
+
+  void dispose(){
+    _arrowAnimationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -75,7 +87,7 @@ class _GenderCardState extends State<GenderCard> {
       alignment: Alignment.center,
       children: <Widget>[
         GenderCircle(),
-        GenderArrow(angle: _genderAngles[Gender.female]),
+        GenderArrow(listenable: _arrowAnimationController),
       ],
     );
   }
@@ -83,8 +95,16 @@ class _GenderCardState extends State<GenderCard> {
   Widget _drawGestureDetector(){
     return Positioned.fill(
       child: TapHandler(
-        onGenderTapped: (gender)=> setState(()=>selectedGender = gender),
+        onGenderTapped: _setSelectedGender,
       ),
+    );
+  }
+
+  void _setSelectedGender(gender) {
+    setState(()=>selectedGender = gender);
+    _arrowAnimationController.animateTo(
+      _genderAngles[gender],
+      duration: Duration(milliseconds: 150)
     );
   }
 }
@@ -182,10 +202,10 @@ class GenderIconTranslated extends StatelessWidget {
   }
 }
 
-class GenderArrow extends StatelessWidget {
-  final double angle;
+class GenderArrow extends AnimatedWidget {
+  
 
-  const GenderArrow({Key key, this.angle}) : super(key: key);
+  const GenderArrow({Key key, Listenable listenable}) : super(key: key, listenable: listenable);
 
   double _arrowLength(BuildContext context) => sizeObject.ScreenAwareSize(32.0, context);
 
@@ -193,8 +213,9 @@ class GenderArrow extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+    Animation animation = listenable;
     return Transform.rotate(
-      angle: angle,
+      angle: animation.value,
       child: Transform.translate(
         offset: Offset(0.0,_translationOffset(context)),
         child: Transform.rotate(
