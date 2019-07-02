@@ -42,17 +42,17 @@ class WeightSlider extends StatelessWidget {
 
           return isExtra
                 ? new Container()
-                 : //GestureDetector(
-                //     behavior: HitTestBehavior.translucent,
-                //     onTap: _animateTo(itemValue,durationMillis: 50), 
-                  /*  child:*/  FittedBox(
+                : GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: ()=>_animateTo(itemValue), 
+                    child:  FittedBox(
                       child: Text(
                         itemValue.toString(),
                         style: _getTextStyle(itemValue),
                       ),
                       fit: BoxFit.scaleDown,
-                    );
-                  // );
+                    )
+                  );
         },
       ),
     );
@@ -85,7 +85,9 @@ class WeightSlider extends StatelessWidget {
             scrollController.position.activity is! HoldScrollActivity;
   }
 
-  _animateTo(int valueToSelect, {int durationMillis = 200}){
+  void _animateTo(int valueToSelect, {int durationMillis = 200}){
+    if(durationMillis == 50)
+      print('onTap function called with itemValue = $valueToSelect \n');
     double targetExtent = (valueToSelect - minValue) * itemExtent;
     scrollController.animateTo(
       targetExtent,
@@ -100,6 +102,7 @@ class WeightSlider extends StatelessWidget {
 
       if(_userStoppedScrolling(notification)){
         _animateTo(middleValue);
+        // print("middle-value = $middleValue ,Value(index = 1 + offset/itemExtent) = ${_indexToValue((notification.metrics.pixels ~/ itemExtent) + 1)}\n");
       }
 
       if(middleValue != value){
