@@ -86,8 +86,8 @@ class WeightSlider extends StatelessWidget {
   }
 
   void _animateTo(int valueToSelect, {int durationMillis = 200}){
-    if(durationMillis == 50)
-      print('onTap function called with itemValue = $valueToSelect \n');
+    // if(durationMillis == 50)
+    //   print('onTap function called with itemValue = $valueToSelect \n');
     double targetExtent = (valueToSelect - minValue) * itemExtent;
     scrollController.animateTo(
       targetExtent,
