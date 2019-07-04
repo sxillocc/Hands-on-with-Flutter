@@ -3,6 +3,7 @@ import 'package:bmi_calculator/widget_utils.dart' as sizeObject;
 import 'package:bmi_calculator/gender_card.dart';
 import 'package:bmi_calculator/weight_card.dart';
 import 'package:bmi_calculator/height_card.dart';
+import 'package:bmi_calculator/pacman_slider.dart';
 
 class InputPage extends StatelessWidget {
   @override
@@ -60,21 +61,21 @@ class InputPage extends StatelessWidget {
 
   Widget _buildBottom(BuildContext context){
     return Container(
-      child: Switch(value: true,onChanged: (value){ },),
+      child: PacmanSlider(),
       alignment: Alignment.center,
       height: sizeObject.ScreenAwareSize(108.0, context),
       width: double.infinity,
     );
   }
 
-  Widget _tempCard(String label){
-    return Card(
-      child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        child: Text(label),
-      ),
-    );
-  }
+  // Widget _tempCard(String label){
+  //   return Card(
+  //     child: Container(
+  //       width: double.infinity,
+  //       height: double.infinity,
+  //       child: Text(label),
+  //     ),
+  //   );
+  // }
 
 }

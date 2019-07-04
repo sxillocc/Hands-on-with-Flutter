@@ -44,7 +44,7 @@ class WeightSlider extends StatelessWidget {
                 ? new Container()
                 : GestureDetector(
                     behavior: HitTestBehavior.translucent,
-                    onTap: ()=>_animateTo(itemValue), 
+                    onTap: ()=>_animateTo(itemValue,durationMillis: 50), 
                     child:  FittedBox(
                       child: Text(
                         itemValue.toString(),
