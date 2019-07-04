@@ -10,19 +10,27 @@ class PacmanSlider extends StatefulWidget {
 
 class _PacmanSliderState extends State<PacmanSlider> 
       with TickerProviderStateMixin{
-  int numberOfDots = 11;
+  int numberOfDots = 9;
+  double _pacmanPostion = 24.0;
   double minOpacity = 0.1;
   double maxOpacity = 0.5;
+  double _pacmanMinPosition() => 24.0;
+  double _pacmanMaxPosition({double width}) => width - 2 * ScreenAwareSize(24.0, context) + ScreenAwareSize(23.0, context)/2;
+  
   AnimationController hintAnimationController;
+  AnimationController pacmanAnimationController;
+  Animation<double> pacmanAnimation;
   
   void initState(){
     super.initState();
     _initHintAnimationController();
+    _initPacmanAnimationController();
     hintAnimationController.forward();
   }
 
   void dispose(){
     hintAnimationController.dispose();
+    pacmanAnimationController.dispose();
     super.dispose();
   }
 
@@ -40,19 +48,64 @@ class _PacmanSliderState extends State<PacmanSlider>
     });
   }
 
+  _initPacmanAnimationController(){
+    pacmanAnimationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 400),
+    );
+  }
+
+  _initPacmanAnimation({width}){
+    Animation<double> animation = Tween(
+      begin: _pacmanMinPosition(),
+      end: _pacmanMaxPosition(width: width)
+    ).animate(pacmanAnimationController);
+
+    animation.addListener((){
+      setState(() {
+        _pacmanPostion = animation.value;
+      });
+      if(animation.status == AnimationStatus.completed){
+        Future.delayed(Duration(seconds: 1),()=>_resetPacman());
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    Decoration decoration = BoxDecoration(
+        color: Theme.of(context).primaryColor,
+        borderRadius: BorderRadius.circular(8.0)
+    );
     return Container(
       margin: EdgeInsets.symmetric(horizontal: ScreenAwareSize(24.0, context)),
-      padding: EdgeInsets.symmetric(horizontal: ScreenAwareSize(24.0, context)),
       height: ScreenAwareSize(52.0, context),
       width: double.infinity,
-      child: Row(
-        children: <Widget>[
-          PacmanIcon(),
-          Expanded(child: _drawDots(),)
-        ],
+      child: LayoutBuilder(
+        builder: (context,constraints){
+          return GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () => _animateToEnd(width: constraints.maxWidth),
+            child: Stack(
+              alignment: Alignment.centerLeft,
+              children: <Widget>[
+                _drawDots(),
+                _drawDotCurtain(_pacmanPostion, constraints.maxWidth, constraints.maxHeight),
+                _drawPacman(sliderWidth: constraints.maxWidth),
+              ],
+            ),
+          );
+        },
       ),
+      decoration: decoration,
+    );
+  }
+
+  Widget _drawDotCurtain(double position, double width,double height){
+    width = position;
+    return Container(
+      height: height,
+      width: width,
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
         borderRadius: BorderRadius.circular(8.0)
@@ -60,11 +113,63 @@ class _PacmanSliderState extends State<PacmanSlider>
     );
   }
 
+  Widget _drawPacman({double sliderWidth}){
+    if(pacmanAnimation == null && sliderWidth != 0){
+      _initPacmanAnimation(width: sliderWidth);
+    }
+    return Positioned(
+      left: _pacmanPostion,
+      child: GestureDetector(
+        onHorizontalDragUpdate: (details) => _onPacmanDragUpdate(sliderWidth,details),
+        onHorizontalDragEnd: (details) => _onPacmanDragEnd(sliderWidth, details),
+        child: PacmanIcon()
+      ),
+    );
+  }
+
+  _onPacmanDragUpdate(double width,DragUpdateDetails details){
+    setState(() {
+      _pacmanPostion += details.delta.dx ;
+      _pacmanPostion = _normalizePacmanPostion(width ,_pacmanPostion);
+    });
+  }
+
+  _normalizePacmanPostion(double width,double position){
+      width = _pacmanMaxPosition(width: width);
+      position = math.max(_pacmanMinPosition(), math.min(position, width));
+      return position;
+  }
+
+  _onPacmanDragEnd(double width,DragEndDetails details){
+    bool isLessThenHalf = _pacmanPostion + ScreenAwareSize(23.0, context)/2 < 0.5 * width;
+    if(isLessThenHalf){
+      _resetPacman();
+    }else{
+      _animateToEnd(width: width);
+    }
+
+  }
+
+  void _animateToEnd({double width}){
+    pacmanAnimationController.forward(
+      from: _pacmanPostion/_pacmanMaxPosition(width: width)
+    );
+  }
+
+  void _resetPacman() {
+    setState(() {
+      _pacmanPostion = _pacmanMinPosition();
+    });
+  }
+
   Widget _drawDots(){
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(numberOfDots, _generateDots)
-              ..add(Opacity(opacity: maxOpacity,child: Dot(size: 14.0))),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: ScreenAwareSize(24.0, context)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: List.generate(numberOfDots, _generateDots)
+                ..add(Opacity(opacity: maxOpacity,child: Dot(size: 14.0))),
+      ),
     );
   }
 
@@ -131,7 +236,7 @@ class PacmanIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(right: ScreenAwareSize(16.0, context)),
+      padding: EdgeInsets.only(right: ScreenAwareSize(0.0, context)),
       child: SvgPicture.asset(
         "images/pacman.svg",
         width: ScreenAwareSize(21.0, context),
