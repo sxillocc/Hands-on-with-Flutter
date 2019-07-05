@@ -1,25 +1,68 @@
+import 'package:bmi_calculator/fade_route.dart';
+import 'package:bmi_calculator/transition_dots.dart';
 import 'package:flutter/material.dart';
 import 'package:bmi_calculator/widget_utils.dart' as sizeObject;
 import 'package:bmi_calculator/gender_card.dart';
 import 'package:bmi_calculator/weight_card.dart';
 import 'package:bmi_calculator/height_card.dart';
 import 'package:bmi_calculator/pacman_slider.dart';
+import 'package:bmi_calculator/result_page.dart';
 
-class InputPage extends StatelessWidget {
+class InputPage extends StatefulWidget {
+  @override
+  _InputPageState createState() => _InputPageState();
+}
+
+class _InputPageState extends State<InputPage> 
+      with TickerProviderStateMixin{
+
+  AnimationController _submitAnimationController;
+
+  void initState(){
+    super.initState();
+    _submitAnimationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2),
+    );
+    _submitAnimationController.addStatusListener((status){
+      if(status == AnimationStatus.completed){
+        _goToResultPage().then((_)=>_submitAnimationController.reset());
+      }
+    });
+  }
+
+  _goToResultPage() async {
+    return Navigator.of(context).push(FadeRoute(
+      builder: (context) => ResultPage(),
+    ));
+  }
+  
+  void dispose(){
+    _submitAnimationController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: MediaQuery.of(context).padding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            _buildTitle(context),
-            Expanded(child: _buildCards(context),),
-            _buildBottom(context),
-          ],
+    return Stack(
+      children: <Widget>[ 
+        Scaffold(
+          body: Padding(
+            padding: MediaQuery.of(context).padding,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _buildTitle(context),
+                Expanded(child: _buildCards(context),),
+                _buildBottom(context),
+              ],
+            ),
+          ),
         ),
-      ),
+        TransitionDots(
+          animation: _submitAnimationController,
+        )
+      ]
     );
   }
 
@@ -61,21 +104,17 @@ class InputPage extends StatelessWidget {
 
   Widget _buildBottom(BuildContext context){
     return Container(
-      child: PacmanSlider(),
+      child: PacmanSlider(
+        submitAnimationController: _submitAnimationController,
+        onSubmit: ()=>_onPacmanSubmit(),
+      ),
       alignment: Alignment.center,
       height: sizeObject.ScreenAwareSize(108.0, context),
       width: double.infinity,
     );
   }
 
-  // Widget _tempCard(String label){
-  //   return Card(
-  //     child: Container(
-  //       width: double.infinity,
-  //       height: double.infinity,
-  //       child: Text(label),
-  //     ),
-  //   );
-  // }
-
+  void _onPacmanSubmit(){
+    _submitAnimationController.forward();
+  }
 }

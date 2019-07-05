@@ -4,6 +4,11 @@ import 'package:flutter_svg/svg.dart';
 import 'dart:math' as math;
 
 class PacmanSlider extends StatefulWidget {
+  final AnimationController submitAnimationController;
+  final VoidCallback onSubmit;
+
+  PacmanSlider({Key key,this.submitAnimationController,this.onSubmit}): super(key: key);
+
   @override
   _PacmanSliderState createState() => _PacmanSliderState();
 }
@@ -14,17 +19,28 @@ class _PacmanSliderState extends State<PacmanSlider>
   double _pacmanPostion = 24.0;
   double minOpacity = 0.1;
   double maxOpacity = 0.5;
+  // double _pacmanSliderPadding() => ScreenAwareSize(12, context);
   double _pacmanMinPosition() => 24.0;
-  double _pacmanMaxPosition({double width}) => width - 2 * ScreenAwareSize(24.0, context) + ScreenAwareSize(23.0, context)/2;
+  double _pacmanMaxPosition({double width}) => width - 2 * ScreenAwareSize(24.0, context) + ScreenAwareSize(10.5, context);
   
   AnimationController hintAnimationController;
   AnimationController pacmanAnimationController;
   Animation<double> pacmanAnimation;
+  Animation<BorderRadius> _borderAnimation;
+  Animation<double> _submitWidthAnimation;
+  double get width => _submitWidthAnimation?.value ?? 0.0;
   
   void initState(){
     super.initState();
     _initHintAnimationController();
     _initPacmanAnimationController();
+    _borderAnimation = BorderRadiusTween(
+      begin: BorderRadius.circular(8.0),
+      end: BorderRadius.circular(50.0)
+    ).animate(CurvedAnimation(
+      curve: Interval(0.0, 0.07),
+      parent: widget.submitAnimationController
+    ));
     hintAnimationController.forward();
   }
 
@@ -66,6 +82,7 @@ class _PacmanSliderState extends State<PacmanSlider>
         _pacmanPostion = animation.value;
       });
       if(animation.status == AnimationStatus.completed){
+        widget.onSubmit();
         Future.delayed(Duration(seconds: 1),()=>_resetPacman());
       }
     });
@@ -73,39 +90,59 @@ class _PacmanSliderState extends State<PacmanSlider>
 
   @override
   Widget build(BuildContext context) {
-    Decoration decoration = BoxDecoration(
-        color: Theme.of(context).primaryColor,
-        borderRadius: BorderRadius.circular(8.0)
-    );
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: ScreenAwareSize(24.0, context)),
-      height: ScreenAwareSize(52.0, context),
-      width: double.infinity,
-      child: LayoutBuilder(
-        builder: (context,constraints){
-          return GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: () => _animateToEnd(width: constraints.maxWidth),
-            child: Stack(
-              alignment: Alignment.centerLeft,
-              children: <Widget>[
-                _drawDots(),
-                _drawDotCurtain(_pacmanPostion, constraints.maxWidth, constraints.maxHeight),
-                _drawPacman(sliderWidth: constraints.maxWidth),
-              ],
-            ),
-          );
-        },
-      ),
-      decoration: decoration,
+    return LayoutBuilder(
+      builder: (context,constraints){
+        // width = constraints.maxWidth;
+        _submitWidthAnimation = Tween(
+          begin: constraints.maxWidth,
+          end: ScreenAwareSize(52.0, context)
+        ).animate(CurvedAnimation(
+          parent: widget.submitAnimationController,
+          curve: Interval(0.05,0.15)
+        ));
+        return AnimatedBuilder(
+          animation: widget.submitAnimationController,
+          builder: (context,child){
+            Decoration decoration = BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: _borderAnimation.value
+            );
+            return Center(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: ScreenAwareSize(24.0, context)),
+                height: ScreenAwareSize(52.0, context),
+                width: width,
+                child: LayoutBuilder(
+                  builder: (context,constraints){
+                    return _submitWidthAnimation.isDismissed ? GestureDetector(
+                      behavior: HitTestBehavior.translucent,
+                      onTap: () => _animateToEnd(width: constraints.maxWidth),
+                      child: Stack(
+                        alignment: Alignment.centerLeft,
+                        children: <Widget>[
+                          _drawDots(),
+                          _drawDotCurtain(_pacmanPostion, constraints.maxWidth, constraints.maxHeight),
+                          _drawPacman(sliderWidth: constraints.maxWidth),
+                        ],
+                      ),
+                    ) : Container();  
+                  },
+                ),
+                decoration: decoration,
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
   Widget _drawDotCurtain(double position, double width,double height){
-    width = position;
+    width = position - _pacmanMinPosition();
     return Container(
       height: height,
       width: width,
+      margin: EdgeInsets.only(left: _pacmanMinPosition()),
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
         borderRadius: BorderRadius.circular(8.0)
