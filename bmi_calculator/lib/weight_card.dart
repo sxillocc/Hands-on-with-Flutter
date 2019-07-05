@@ -6,8 +6,9 @@ import 'package:bmi_calculator/weight_slider.dart';
 
 class WeightCard extends StatefulWidget {
   final int initialWeight;
+  final ValueChanged<int> onWeightChanged;
 
-  const WeightCard({Key key,this.initialWeight}): super(key:key);
+  const WeightCard({Key key,this.initialWeight,this.onWeightChanged}): super(key:key);
   
   @override
   _WeightCardState createState() => _WeightCardState();
@@ -55,7 +56,10 @@ class _WeightCardState extends State<WeightCard> {
               maxValue: 110,
               width: constraints.maxWidth,
               value: weight,
-              onChanged: (val)=> setState(() => weight = val),
+              onChanged: (val)=> setState((){
+                weight = val;
+                widget.onWeightChanged(weight);
+              }),
             );
         }
       ),

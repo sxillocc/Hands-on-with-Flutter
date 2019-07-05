@@ -17,8 +17,9 @@ const Map<Gender, double> _genderAngles = {
 
 class GenderCard extends StatefulWidget {
   final Gender initialGender;
+  final ValueChanged<Gender> onGenderChanged;
 
-  const GenderCard({Key key, this.initialGender}) : super(key: key);
+  const GenderCard({Key key, this.initialGender,this.onGenderChanged}) : super(key: key);
 
   @override
   _GenderCardState createState() => _GenderCardState();
@@ -101,7 +102,10 @@ class _GenderCardState extends State<GenderCard> with SingleTickerProviderStateM
   }
 
   void _setSelectedGender(gender) {
-    setState(()=>selectedGender = gender);
+    setState((){
+      selectedGender = gender;
+      widget.onGenderChanged(gender);
+    });
     _arrowAnimationController.animateTo(
       _genderAngles[gender],
       duration: Duration(milliseconds: 150)

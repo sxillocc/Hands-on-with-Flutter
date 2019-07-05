@@ -7,6 +7,7 @@ import 'package:bmi_calculator/weight_card.dart';
 import 'package:bmi_calculator/height_card.dart';
 import 'package:bmi_calculator/pacman_slider.dart';
 import 'package:bmi_calculator/result_page.dart';
+import 'package:bmi_calculator/model/gender.dart';
 
 class InputPage extends StatefulWidget {
   @override
@@ -16,9 +17,15 @@ class InputPage extends StatefulWidget {
 class _InputPageState extends State<InputPage> 
       with TickerProviderStateMixin{
 
+  int weight;
+  int height;
+  Gender gender;
   AnimationController _submitAnimationController;
 
   void initState(){
+    weight = 70;
+    height = 170;
+    gender = Gender.other;
     super.initState();
     _submitAnimationController = AnimationController(
       vsync: this,
@@ -33,7 +40,10 @@ class _InputPageState extends State<InputPage>
 
   _goToResultPage() async {
     return Navigator.of(context).push(FadeRoute(
-      builder: (context) => ResultPage(),
+      builder: (context) => ResultPage(
+        weight: weight,
+        height: height,
+      ),
     ));
   }
   
@@ -91,12 +101,21 @@ class _InputPageState extends State<InputPage>
           Expanded(
             child: Column(
               children: <Widget>[
-                Expanded(child: GenderCard(),),
-                Expanded(child: WeightCard(),)
+                Expanded(child: GenderCard(
+                  initialGender: gender,
+                  onGenderChanged: (val) => gender = val,
+                ),),
+                Expanded(child: WeightCard(
+                  initialWeight: weight,
+                  onWeightChanged: (val) => weight = val,
+                ),)
               ],
             ),
           ),
-          Expanded(child: HeightCard(),)
+          Expanded(child: HeightCard(
+            height: height,
+            onHeightChanged: (val) => height = val,
+          ),)
         ],
       ),
     );

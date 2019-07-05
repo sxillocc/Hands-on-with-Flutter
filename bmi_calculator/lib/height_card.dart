@@ -6,8 +6,9 @@ import 'package:bmi_calculator/height_picker.dart';
 
 class HeightCard extends StatefulWidget {
   final int height;
+  final ValueChanged<int> onHeightChanged;
   
-  HeightCard({this.height, Key key}) : super(key: key);
+  HeightCard({this.height, Key key,this.onHeightChanged}) : super(key: key);
 
   @override
   _HeightCardState createState() => _HeightCardState();
@@ -37,7 +38,10 @@ class _HeightCardState extends State<HeightCard> {
                     return HeightPicker(
                       widgetHeight: constraints.maxHeight,
                       height: height,
-                      onChanged: (val) => setState(() => height = val),
+                      onChanged: (val) => setState((){
+                        height = val;
+                        widget.onHeightChanged(height);
+                      }),
                     );
                   },
                 ),
