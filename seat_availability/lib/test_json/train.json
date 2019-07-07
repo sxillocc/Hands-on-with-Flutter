@@ -1,0 +1,11 @@
+{
+    "days": [{"runs": "N", "code": "MON"}, {"runs": "N", "code": "TUE"}, {"runs": "N", "code": "WED"}, {"runs": "N", "code": "THU"}, {"runs": "Y", "code": "FRI"}, {"runs": "N", "code": "SAT"}, {"runs": "N", "code": "SUN"}], 
+    "from_station": {"code": "JAM", "lng": 70.05773, "name": "JAMNAGAR", "lat": 22.4707019}, 
+    "src_departure_time": "11:40", 
+    "classes": [{"code": "CC", "name": "AC CHAIR CAR"}, {"code": "1A", "name": "FIRST AC"}, {"code": "FC", "name": "FIRST CLASS"}, {"code": "3E", "name": "3rd AC ECONOMY"}, {"code": "SL", "name": "SLEEPER CLASS"}, {"code": "3A", "name": "THIRD AC"}, {"code": "2A", "name": "SECOND AC"}, {"code": "2S", "name": "SECOND SEATING"}], 
+    "name": "UTTARANCHAL EXP", 
+    "dest_arrival_time": "03:45", 
+    "travel_time": "16:05",
+    "number": "19565", 
+    "to_station": {"code": "JP", "lng": 75.7872709, "name": "JAIPUR", "lat": 26.9124336}
+}
