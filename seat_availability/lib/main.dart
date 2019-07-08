@@ -1,12 +1,11 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:seat_availability/models/trains.dart';
 
 void main(){
   runApp(MyApp());
-  getTrainInfo();
+  getTrain();
 }
 
 class MyApp extends StatelessWidget {
@@ -38,12 +37,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-Future<String> loadTestJsonTrain() async {
-  return await rootBundle.loadString("lib/test_json/train.json");
-}
-
-Future<Train> getTrain() async{
-  String rootJsonTrain = await loadTestJsonTrain();
-  // print(rootJsonTrain);
-  return Train.fromJson(jsonDecode(rootJsonTrain));
+Future<TrainInfo> getTrain() async{
+  String rootJsonTrain = await rootBundle.loadString("lib/test_json/train.json");
+  Map jsonMap = jsonDecode(rootJsonTrain);
+  if(jsonMap['response_code'] == 200){
+    TrainInfo trainInfo = TrainInfo.fromJson(jsonMap);
+    return trainInfo;
+  }
+  else
+    throw Exception("data not fetched");
 }

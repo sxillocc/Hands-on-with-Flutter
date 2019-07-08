@@ -1,17 +1,40 @@
-class Train{
-  final String number,name,travelTime,srcDepartureTime,destArrivalTime;
+class TrainInfo{
+  final Train train;
+  final List<Available> availableList;
   final Station fromStation,toStation;
+  final TrainClass journeyClass;
+
+  TrainInfo({
+    this.train,
+    this.journeyClass,
+    this.fromStation,
+    this.toStation,
+    this.availableList
+  });
+
+  factory TrainInfo.fromJson(Map<String, dynamic> json){
+    List<dynamic> tempAvailablesList = json['availability'] as List;
+    return TrainInfo(
+      train: Train.fromJson(json['train']),
+      journeyClass: TrainClass.fromJson(json['journey_class']),
+      fromStation: Station.fromJson(json['from_station']),
+      toStation: Station.fromJson(json['to_station']),
+      availableList: tempAvailablesList.map((i)=>Available.fromJson(i)).toList()
+    );
+  }
+}
+
+class Train{
+  final String number,name;//,travelTime,srcDepartureTime,destArrivalTime;
   final List<TrainClass> classesList;
   final List<Day> daysList;
 
   Train({
     this.number,
     this.name,
-    this.travelTime,
-    this.srcDepartureTime,
-    this.destArrivalTime,
-    this.fromStation,
-    this.toStation,
+    // this.travelTime,
+    // this.srcDepartureTime,
+    // this.destArrivalTime,
     this.classesList,
     this.daysList
   });
@@ -22,11 +45,9 @@ class Train{
     return Train(
       number: json['number'],
       name: json['name'],
-      travelTime: json['travel_time'],
-      srcDepartureTime: json['src_departure_time'],
-      destArrivalTime: json['dest_arrival_time'],
-      fromStation: Station.fromJson(json['from_station']),
-      toStation: Station.fromJson(json['to_station']),
+      // travelTime: json['travel_time'],
+      // srcDepartureTime: json['src_departure_time'],
+      // destArrivalTime: json['dest_arrival_time'],
       classesList: tempClassesList.map((i)=>TrainClass.fromJson(i)).toList(),
       daysList: tempDaysList.map((i)=>Day.fromJson(i)).toList(),
     );
@@ -57,7 +78,6 @@ class TrainClass{
       name: json['name'] 
     );
   }
-
 }
 
 class Day{
@@ -70,5 +90,16 @@ class Day{
       runs: json['runs'] 
     );
   }
+}
 
+class Available{
+  final String date, status;
+  Available({this.date,this.status});
+
+  factory Available.fromJson(Map<String, dynamic> json){
+    return Available(
+      date: json['date'],
+      status: json['status'] 
+    );
+  }
 }
