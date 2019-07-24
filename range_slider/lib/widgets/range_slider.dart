@@ -10,36 +10,39 @@ class _FancyRangeSliderState extends State<FancyRangeSlider> {
   final double sliderHeight = 5;
   double sliderWidth;
   double curtainWidth=7.5;
-  double fromLeft = 8.5;
-  double fromLeft2 = 100;
+  double fromLeft = 0;
+  double fromLeft2 = 0;
   int value = 0;
   int value2 = 0;
+  double sliderPadding = 16;
+  double pinDiameter = 15;
+  double cardDiameter = 30;
+  double get borderSize => (cardDiameter - pinDiameter)/2;
+  double get minPos => sliderPadding - (cardDiameter-pinDiameter)/2;
+  double get maxPos => sliderWidth + sliderPadding
+                      -pinDiameter - (cardDiameter-pinDiameter)/2;
+  bool _leftActive = false;
+  bool _rightActive = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fromLeft = minPos;
+    fromLeft2 = fromLeft + 3*cardDiameter ;
+  }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context,constraints){
-        sliderWidth = constraints.maxWidth - 32.0;
+        sliderWidth = constraints.maxWidth - 2*sliderPadding;
         value = positionToValue(fromLeft);
         value2 = positionToValue(fromLeft2);
         return Stack(
-          alignment: Alignment(-1,0.716981132),
           children: <Widget>[
-            Container(
-              width: double.infinity,
-              height: 58,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Container(
-                width: double.infinity,
-                height: sliderHeight,
-                decoration: BoxDecoration(
-                    color: Colors.blue[100],
-                    borderRadius: BorderRadius.circular(sliderHeight/2)
-                ),
-              ),
-            ),
+            _sliderContainer(),
+            _sliderBar(),
             _drawCurtains(),
             _drawLeftCircle(),
             _drawRightCircle()
@@ -49,10 +52,33 @@ class _FancyRangeSliderState extends State<FancyRangeSlider> {
     );
   }
 
+  Widget _sliderContainer(){
+    return Container(
+      width: double.infinity,
+      height: cardDiameter+pinDiameter + borderSize,
+    );
+  }
+
+  Widget _sliderBar(){
+    return Positioned(
+      top: cardDiameter+(pinDiameter/2)-(sliderHeight/2),
+      left: sliderPadding,
+        child: Container(
+          width: sliderWidth,
+          height: sliderHeight,
+          decoration: BoxDecoration(
+              color: Colors.blue[100],
+              borderRadius: BorderRadius.circular(sliderHeight/2)
+          ),
+        ),
+
+    );
+  }
+
   Widget _drawCurtains(){
     return Positioned(
-      left: fromLeft + 15,
-      top: 40+(15-sliderHeight)/2,
+      left: fromLeft + cardDiameter/2,
+      top: cardDiameter+(pinDiameter/2)-(sliderHeight/2),
       child: Container(
         height: sliderHeight,
         width: (fromLeft2-fromLeft),
@@ -62,97 +88,147 @@ class _FancyRangeSliderState extends State<FancyRangeSlider> {
   }
 
   double _normalizeLeft(double num){
-    num = math.max(8.5, math.min(num, fromLeft2-30));
+    num = math.max(minPos, math.min(num, fromLeft2-cardDiameter));
     return num;
   }
 
   double _normalizeRight(double num){
-    num = math.max(fromLeft+30, math.min(num, sliderWidth-6.5));
+    num = math.max(fromLeft+cardDiameter, math.min(num, maxPos));
     return num;
   }
 
   int positionToValue(double p){
-    return (10*(p - 8.5) / (sliderWidth-15)).round();
+    return (10*(p - minPos) / (sliderWidth-pinDiameter)).round();
   }
 
   Widget _drawLeftCircle(){
     return Positioned(
+      top: 0,
       left: fromLeft,
-      top: 10,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            height: 30,
-            alignment: Alignment.center,
-            width: 30,
-            decoration: BoxDecoration(
-              color: Colors.blue,
-              shape: BoxShape.circle
-            ),
-            child: Text('$value',style: TextStyle(fontSize: 20.0,color: Colors.white),),
-          ),
-          GestureDetector(
-            onHorizontalDragUpdate: (DragUpdateDetails details){
-                    Offset x = details.delta;
-                    double dx = x.dx;
-                    setState((){
-                      fromLeft = _normalizeLeft(fromLeft + dx);
-                      value = positionToValue(fromLeft);
-                    });
-                  },
-            child: Container(
-              width: 15,
-              height: 15,
-              decoration: BoxDecoration(
-                    color: Color.fromRGBO(0, 0, 255, 0.5),
-                    shape: BoxShape.circle
+      child: Stack(
+        children:[
+            Positioned(
+              top: cardDiameter-borderSize,
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 100),
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _leftActive ? Color.fromRGBO(0, 0, 0, 0.5) : Color.fromRGBO(0, 0, 255, 0.0)
+                ),
+                width: pinDiameter + 2*borderSize,
+                height: pinDiameter + 2*borderSize,
               ),
             ),
-          ),
-        ],
+            Container(
+              height: cardDiameter+pinDiameter + borderSize,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    height: cardDiameter,
+                    alignment: Alignment.center,
+                    width: cardDiameter,
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      shape: BoxShape.circle
+                    ),
+                    child: Text('$value',style: TextStyle(fontSize: cardDiameter-10,color: Colors.white),),
+                  ),
+                  GestureDetector(
+                    child: Container(
+                      width: pinDiameter,
+                      height: pinDiameter,
+                      decoration: BoxDecoration(
+                            color: Colors.blue,
+                            shape: BoxShape.circle
+                      ),
+                    ),
+                    onHorizontalDragUpdate: (DragUpdateDetails details){
+                      Offset x = details.delta;
+                      double dx = x.dx;
+                      setState((){
+                        _leftActive = true;
+                        fromLeft = _normalizeLeft(fromLeft + dx);
+                        value = positionToValue(fromLeft);
+                      });
+                    },
+                    onHorizontalDragEnd: (DragEndDetails _){
+                      setState(() {
+                        _leftActive = false;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+        ]
       ),
     );
   }
 
   Widget _drawRightCircle(){
     return Positioned(
+      top: 0,
       left: fromLeft2,
-      top: 10,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            height: 30,
-            alignment: Alignment.center,
-            width: 30,
-            decoration: BoxDecoration(
-                color: Colors.blue,
-                shape: BoxShape.circle
-            ),
-            child: Text('$value2',style: TextStyle(fontSize: 20.0,color: Colors.white),),
-          ),
-          GestureDetector(
-            onHorizontalDragUpdate: (DragUpdateDetails details){
-              Offset x = details.delta;
-              double dx = x.dx;
-              setState((){
-                fromLeft2 = _normalizeRight(fromLeft2 + dx);
-                value2 = positionToValue(fromLeft2);
-              });
-            },
-            child: Container(
-              width: 15,
-              height: 15,
+      child: Stack(
+        children: [
+          Positioned(
+            top: cardDiameter-borderSize,
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 100),
               decoration: BoxDecoration(
-                  color: Color.fromRGBO(0, 0, 255, 0.5),
-                  shape: BoxShape.circle
+                  shape: BoxShape.circle,
+                  color: _rightActive ? Color.fromRGBO(0, 0, 0, 0.5) : Color.fromRGBO(0, 0, 255, 0.0)
               ),
+              width: pinDiameter + 2*borderSize,
+              height: pinDiameter + 2*borderSize,
             ),
           ),
-        ],
+          Container(
+            height: cardDiameter+pinDiameter + borderSize,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  height: cardDiameter,
+                  alignment: Alignment.center,
+                  width: cardDiameter,
+                  decoration: BoxDecoration(
+                      color: Colors.blue,
+                      shape: BoxShape.circle
+                  ),
+                  child: Text('$value2',style: TextStyle(fontSize: cardDiameter-10,color: Colors.white),),
+                ),
+                GestureDetector(
+                  child: Container(
+                    width: pinDiameter,
+                    height: pinDiameter,
+                    decoration: BoxDecoration(
+                        color: Colors.blue,
+                        shape: BoxShape.circle
+                    ),
+                  ),
+                  onHorizontalDragUpdate: (DragUpdateDetails details){
+                    Offset x = details.delta;
+                    double dx = x.dx;
+                    setState((){
+                      _rightActive = true;
+                      fromLeft2 = _normalizeRight(fromLeft2 + dx);
+                      value2 = positionToValue(fromLeft2);
+                    });
+                  },
+                  onHorizontalDragEnd: (DragEndDetails _){
+                    setState(() {
+                      _rightActive = false;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+        ]
       ),
     );
   }
