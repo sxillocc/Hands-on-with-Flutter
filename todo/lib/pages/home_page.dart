@@ -2,6 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:todo/widget_util.dart';
 
 class HomePage extends StatelessWidget {
+
+  List<Widget> generateList(double width,double height,BuildContext context) =>
+      List.generate(6, (index){
+        double marginLeft = index==0 ? screenAwareSize(36, context): 0.125*width/5;
+        double marginRight = index==5 ? screenAwareSize(36, context):0.125*width/5;
+        return Container(
+          width: 3.5*width/5,
+          height: height,
+          margin: EdgeInsets.only(
+            left: marginLeft,
+            right: marginRight
+          ),
+          color: Colors.white,
+        );
+      });
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,17 +94,29 @@ class HomePage extends StatelessWidget {
   Widget _drawCardList(BuildContext context){
     return Expanded(
         child: Container(
-          margin: EdgeInsets.only(top: screenAwareSize(10, context),bottom: screenAwareSize(50, context),left: screenAwareSize(36, context)),
+          margin: EdgeInsets.only(top: screenAwareSize(10, context),bottom: screenAwareSize(50, context)),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text("TODAY : SEPTEMBER 12, 2019",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+              Padding(
+                padding: EdgeInsets.only(left: screenAwareSize(36, context)),
+                child: Text("TODAY : SEPTEMBER 12, 2019",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+              ),
               Expanded(
                 child: Container(
-                  color: Colors.white,
+//                  color: Colors.white,
                   width: double.infinity,
-                  child: Text("temp_card_list"),
+                  child: LayoutBuilder(
+                      builder: (context,constraints){
+                        double containerWidth = constraints.maxWidth;
+                        double containerHeight = constraints.maxHeight;
+                        return ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: generateList(containerWidth, containerHeight, context)
+                        );
+                      }
+                  ),
                   margin: EdgeInsets.symmetric(vertical: 10),
                 ),
               )
@@ -99,3 +127,4 @@ class HomePage extends StatelessWidget {
     );
   }
 }
+
