@@ -26,7 +26,7 @@ class _ThreePointSliderState extends State<ThreePointSlider> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 44,
+      height: 36,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(22.0),
         color: color,

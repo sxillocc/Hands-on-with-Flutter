@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:attendance_counter/widgets/ball_slider.dart';
+import 'package:attendance_counter/widgets/atd_card.dart';
+import 'package:attendance_counter/models/subjects.dart';
+import 'dart:convert';
+//import 'package:percent_indicator/percent_indicator.dart';
+//import 'package:attendance_counter/test.json';
+
 
 void main() => runApp(MyApp());
 
@@ -10,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primaryColor: Colors.pink,
+        primaryColor: Colors.blueGrey,
         textTheme: TextTheme(
           subtitle: TextStyle(fontStyle: FontStyle.italic,fontWeight: FontWeight.w300
                       ,fontSize: 18,color: Colors.red)
@@ -21,7 +26,41 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+
+
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+
+  List<Widget> homeList;
+  List<Subject> subjectList;
+
+  @override
+  void initState() {
+    super.initState();
+    subjectList = List<Subject>();
+    homeList = <Widget>[
+      Container(
+        padding: EdgeInsets.symmetric(vertical: 8.0),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+        ),
+        child: Text(
+          "Today",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 18.0,
+          ),
+        ),
+      )
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,69 +68,70 @@ class MyHomePage extends StatelessWidget {
         centerTitle: true,
         title: Text("Attendance Counter"),
       ),
-      body: Container(
-          padding: EdgeInsets.all(16),
-          alignment: Alignment.center,
-          child: Container(
-            width: double.infinity,
-            height: 160,
-            padding: EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-//              color: Colors.black,
-              border: Border.all(),
-              borderRadius: BorderRadius.circular(8.0)
-            ),
-            child: Column(
-              children: <Widget>[
-                Expanded(
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Container(
-                          color: Colors.white,
-                          child: Column(
-                            children: <Widget>[
-                              Padding(
-                                padding:EdgeInsets.fromLTRB(4,4,4,2),
-                                child: Text(
-                                  'Object Oriented System Design',
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.title,
-                                ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  padding:EdgeInsets.fromLTRB(4,2,4,4),
-                                  child: Text(
-                                    'You have to attend 5 classes in a row',
-                                    style: Theme.of(context).textTheme.subtitle,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 100,
-                        height: 100,
-//                        color: Colors.red,
-                      )
-                    ],
-                  ),
-
-                ),
-                Padding(
-                  padding:EdgeInsets.fromLTRB(4,0,4,0),
-                  child: BallSlider(),
-                ),
-              ],
-            ),
-          )
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton.extended(
+          onPressed: (){},
+//          shape: RoundedRectangleBorder(
+//            borderRadius: BorderRadius.circular(10)
+//          ),
+          backgroundColor: Colors.black,
+          icon: Icon(Icons.add),
+          label: Text("EXTRA CLASS",style: TextStyle(fontSize: 16,fontWeight: FontWeight.w300),)
       ),
+      body: Container(
+          padding: EdgeInsets.only(bottom: 8),
+          alignment: Alignment.center,
+          child: FutureBuilder(
+            future: DefaultAssetBundle.of(context)
+                .loadString("lib/test.json"),
+            builder: (context,snapshot){
+
+              if(snapshot.hasData){
+                print("fetched");
+
+                String json_string = snapshot.data.toString();
+                Map<String, dynamic> parsedJson = json.decode(json_string);
+
+                parsedJson['subjects'].forEach(
+                    (subjectJson){
+                      Subject s = Subject.fromJson(subjectJson);
+                      homeList.add(
+                          SubjectCard(subject: s,)
+                      );
+                    }
+                );
+                return ListView(
+                  children: homeList
+                );
+              }else{
+                return CircularProgressIndicator();
+              }
+
+            },
+          )
+
+      )
     );
   }
 }
 
+class SubjectCard extends StatelessWidget {
+
+  Subject subject;
+
+  SubjectCard({@required this.subject});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(8.0,8,8,0),
+      child: AtdCard(
+        subject: subject.subName,
+        criteria:subject.criteria,
+        percent: subject.getPercent,
+        v: 0,
+        onValueChange: (v){},
+      ),
+    );
+  }
+}

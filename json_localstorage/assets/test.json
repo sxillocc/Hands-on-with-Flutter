@@ -1,0 +1,28 @@
+{
+	"subjects": [
+		{
+			"subName": "Object Oriented Programming",
+			"present": 15,
+			"absent": 12,
+			"criteria": 0.75,
+			"dates": [
+				"01052019",
+				"03052019",
+				"07052019",
+				"08052019"
+			]
+		},
+		{
+			"subName": "Mathematics",
+			"present": 19,
+			"absent": 2,
+			"criteria": 0.75,
+			"dates": [
+				"01052019",
+				"02052019",
+				"03052019",
+				"04052019"
+			]
+		}
+	]
+}

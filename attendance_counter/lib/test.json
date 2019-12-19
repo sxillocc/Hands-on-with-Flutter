@@ -1,0 +1,64 @@
+{
+	"subjects": [
+		{
+			"subName": "Discrete Mathematics",
+			"present": 8,
+			"absent": 6,
+			"criteria": 0.75,
+			"dates": [
+				"01052019",
+				"03052019",
+				"07052019",
+				"08052019"
+			]
+		},
+		{
+			"subName": "Communication Devices",
+			"present": 15,
+			"absent": 5,
+			"criteria": 0.75,
+			"dates": [
+				"01052019",
+				"02052019",
+				"03052019",
+				"04052019"
+			]
+		},
+		{
+			"subName": "Data Structure and Algorithms",
+			"present": 19,
+			"absent": 2,
+			"criteria": 0.75,
+			"dates": [
+				"01052019",
+				"02052019",
+				"03052019",
+				"04052019"
+			]
+		},
+		{
+			"subName": "Database Management System",
+			"present": 25,
+			"absent": 10,
+			"criteria": 0.75,
+			"dates": [
+				"01052019",
+				"02052019",
+				"03052019",
+				"04052019"
+			]
+		},
+		{
+			"subName": "Control System",
+			"present": 9,
+			"absent": 0,
+			"criteria": 0.75,
+			"dates": [
+				"01052019",
+				"02052019",
+				"03052019",
+				"04052019"
+			]
+		}
+	]
+}
