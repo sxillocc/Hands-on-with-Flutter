@@ -19,17 +19,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Color appBarColor = Colors.blueGrey;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: appBarColor,
         centerTitle: true,
         title: Text("Bottom Sheet Example"),
       ),
       body: Center(
         child: Container(
           child: RaisedButton(
-              child: Text("Change your Name"), onPressed: _onChangeName),
+              child: Text("Change Theme Color"), onPressed: _onChangeName),
         ),
       ),
     );
@@ -40,149 +43,86 @@ class _MyHomePageState extends State<MyHomePage> {
         context: context,
         builder: (context) {
           return Scaffold(
-            body: Container(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    height: 40,
-                    color: Colors.red,
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.close, color: appBarColor,),
+                  onPressed: (){
+                    Navigator.pop(context);
+                  },
+                ),
+                Expanded(
+                  child: Container(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Center(
+                          child: Text(
+                            'Choose new theme color',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16.0),
+                          ),
+                        ),
+                        Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 3),
+                            child: RaisedButton(
+                                color: Colors.red,
+                                textColor: Colors.white,
+                                child: Text('Red'),
+                                onPressed: () => setState(() {
+                                      appBarColor = Colors.red;
+                                      Navigator.pop(context);
+                                    })),
+                          ),
+                        ),
+                        Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 3),
+                            child: RaisedButton(
+                                color: Colors.blueGrey,
+                                textColor: Colors.white,
+                                child: Text('Blue Grey'),
+                                onPressed: () => setState(() {
+                                      appBarColor = Colors.blueGrey;
+                                      Navigator.pop(context);
+                                    })),
+                          ),
+                        ),
+                        Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 3),
+                            child: RaisedButton(
+                                color: Colors.blue,
+                                textColor: Colors.white,
+                                child: Text('Blue'),
+                                onPressed: () => setState(() {
+                                      appBarColor = Colors.blue;
+                                      Navigator.pop(context);
+                                    })),
+                          ),
+                        ),
+                        Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 3),
+                            child: RaisedButton(
+                                color: Colors.green,
+                                textColor: Colors.white,
+                                child: Text('Green'),
+                                onPressed: () => setState(() {
+                                      appBarColor = Colors.green;
+                                      Navigator.pop(context);
+                                    })),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                  Container(
-                    height: 40,
-                    color: Colors.blue,
-                  ),
-                  Container(
-                    height: 40,
-                    color: Colors.green,
-                  )
-                ],
-              ),
+                ),
+              ],
             ),
           );
         });
   }
 }
-
-
-//class HomeView extends StatelessWidget {
-//  @override
-//  Widget build(BuildContext context) {
-//    return Scaffold(
-//      appBar: AppBar(
-//        leading: Icon(Icons.details),
-//        title: Text('Bottom Sheet Demo'),
-//      ),
-//      floatingActionButton: MyFloatingActionButton(),
-//      body: Center(
-//        child: Text('HomeView'),
-//      ),
-//    );
-//  }
-//}
-//class MyFloatingActionButton extends StatefulWidget {
-//  @override
-//  _MyFloatingActionButtonState createState() => _MyFloatingActionButtonState();
-//}
-//
-//class _MyFloatingActionButtonState extends State<MyFloatingActionButton> {
-//
-//  bool showFab = true;
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return showFab ? FloatingActionButton(
-//        onPressed: (){
-//          var bottomSheetController = showBottomSheet(
-//              context: context,
-//              builder: (context){
-//                return FractionallySizedBox(
-//                    heightFactor: 0.5,
-//                    child: BottomSheetWidget(),
-//                );
-//              },
-//              elevation: 15
-//          );
-//          showFAB(false);
-//          bottomSheetController.closed.then((value){
-//            showFAB(true);
-//          });
-//        }
-//    ) :
-//    Container();
-//  }
-//
-//  void showFAB(bool showButton){
-//    setState(() {
-//      showFab = showButton;
-//    });
-//  }
-//}
-//
-//class BottomSheetWidget extends StatefulWidget {
-//  @override
-//  _BottomSheetWidgetState createState() => _BottomSheetWidgetState();
-//}
-//
-//class _BottomSheetWidgetState extends State<BottomSheetWidget> {
-//  @override
-//  Widget build(BuildContext context) {
-//    return Container(
-//      margin: const EdgeInsets.only(top: 5, left: 15, right: 15),
-//      height: 160,
-//      decoration: BoxDecoration(
-//        color: Colors.blue,
-//        border: Border.all(
-//          color: Colors.blue
-//        )
-//      ),
-//      child: Column(
-//        mainAxisSize: MainAxisSize.max,
-//        mainAxisAlignment: MainAxisAlignment.center,
-//        children: <Widget>[
-//          Container(
-//            height: 50,
-//            decoration: BoxDecoration(
-//              color: Colors.blueGrey[300],
-//              borderRadius: BorderRadius.circular(10)
-//            ),
-//            alignment: Alignment.center,
-//            margin: const EdgeInsets.all(10),
-//            padding: const EdgeInsets.all(10),
-//            child: TextField(
-//              decoration: InputDecoration.collapsed(hintText: 'Enter your name'),
-//            ),
-//          ),
-//          SheetButton()
-//        ],
-//      ),
-//    );
-//  }
-//}
-//
-//class SheetButton extends StatefulWidget {
-//  _SheetButtonState createState() => _SheetButtonState();
-//}
-//class _SheetButtonState extends State<SheetButton> {
-//  bool checkingFlight = false;
-//  bool success = false;
-//  @override
-//  Widget build(BuildContext context) {
-//    return !checkingFlight
-//        ? MaterialButton(
-//      color: Colors.grey[800],
-//      onPressed: () {
-//      },
-//      child: Text(
-//        'Check Flight',
-//        style: TextStyle(color: Colors.white),
-//      ),
-//    )
-//        : !success
-//        ? CircularProgressIndicator()
-//        : Icon(
-//      Icons.check,
-//      color: Colors.green,
-//    );
-//  }
-//}
